@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>NuSpec</id>
-    <version>3.0.0</version>
+    <version>3.0.1</version>
     <authors>Xavier Decoster</authors>
     <owners>MyGet</owners>
     <licenseUrl>https://github.com/myget/NuGetPackages/blob/master/license.txt</licenseUrl>

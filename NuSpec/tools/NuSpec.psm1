@@ -223,11 +223,69 @@ function Pack-Nuget {
     }
 }
 
+function Push-Nuget {
+    param (
+        [parameter(ValueFromPipelineByPropertyName = $true)]
+        [string[]]$ProjectName,
+        [string] $specFile,
+        [parameter(Mandatory=$true)]
+        [string] $Source
+    )
+    Process {
+
+        $projects = (Resolve-ProjectName $ProjectName)
+        
+        if(!$projects) {
+            Write-Error "Unable to locate project. Make sure it isn't unloaded."
+            return
+        }
+		
+		$profileDirectory = Split-Path $profile -parent
+		$profileModulesDirectory = (Join-Path $profileDirectory "Modules")
+		$moduleDir = (Join-Path $profileModulesDirectory "NuSpec")
+      
+        
+        $projects | % { 
+            Push-Location
+            try {
+                $project = $_
+            
+                # Set the nuspec target path
+                $projectFile = Get-Item $project.FullName
+                $projectDir = [System.IO.Path]::GetDirectoryName($projectFile)
+                $projectNuspec = "$($project.Name).nuspec"
+                if (![string]::isnullorempty($specFile)) {
+					$projectNuspec = $specFile
+                }
+                $projectNuspecPath = Join-Path $projectDir $projectNuspec
+                
+                cd $projectDir
+                
+                
+
+                if (![string]::isnullorempty($specFile)) {
+                    $nupkgs = gci . -Filter "$specFile.*.nupkg" -File
+                } else {
+                    $nupkgs = gci . -Filter "*.nupkg" -File
+                }
+
+                $nupkgs | sort -Descending -Property CreationTime
+                $pkg = $nupkgs[0]
+                
+                nuget push $pkg.FullName -source $source
+            }
+            finally {
+                Pop-Location
+            }
+        }      
+    }
+}
+
 # Statement completion for project names
-'Install-NuSpec', 'Enable-NuSpecIntelliSense', 'Pack-Nuget' | %{ 
+'Install-NuSpec', 'Enable-NuSpecIntelliSense', 'Pack-Nuget', 'Push-Nuget'  | %{ 
     Register-TabExpansion $_ @{
         ProjectName = { Get-Project -All | Select -ExpandProperty Name }
     }
 }
 
-Export-ModuleMember Install-NuSpec, Enable-NuSpecIntelliSense, Pack-Nuget
+Export-ModuleMember Install-NuSpec, Enable-NuSpecIntelliSense, Pack-Nuget, Push-Nuget

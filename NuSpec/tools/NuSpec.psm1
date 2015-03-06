@@ -176,7 +176,8 @@ function Pack-Nuget {
     param (
         [parameter(ValueFromPipelineByPropertyName = $true)]
         [string[]]$ProjectName,
-        [string] $specFile
+        [string] $specFile,
+        [switch][bool] $noProjectRefs
     )
     Process {
 
@@ -207,13 +208,21 @@ function Pack-Nuget {
                 $projectNuspecPath = Join-Path $projectDir $projectNuspec
                 
                 cd $projectDir
-                
+                $args = @()
+
+
                 if (![string]::isnullorempty($specFile)) {
-                    nuget pack $projectNuspecPath
+                    $args += $projectNuspecPath
                 } else {
-                    nuget pack 
+                    $args += $projectFile
+                }
+
+                if (!$noProjectRefs) {
+                    $args += "-IncludeReferencedProjects"
                 }
                 
+                nuget pack $args
+
                 
             }
             finally {

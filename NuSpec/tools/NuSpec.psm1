@@ -86,9 +86,10 @@ function Install-NuSpec {
             return
         }
 		
-		$profileDirectory = Split-Path $profile -parent
-		$profileModulesDirectory = (Join-Path $profileDirectory "Modules")
-		$moduleDir = (Join-Path $profileModulesDirectory "NuSpec")
+        $m = get-module NuSpec
+		#$profileDirectory = Split-Path $profile -parent
+		#$profileModulesDirectory = (Join-Path $profileDirectory "Modules")
+		$moduleDir = split-path -parent $m.Path
 		
         if($EnableIntelliSense){
             Enable-NuSpecIntelliSense            
@@ -112,6 +113,7 @@ function Install-NuSpec {
                 $nuspecTemplatePath = Join-Path $moduleDir NuSpecTemplate.xml
             }
             
+            write-verbose "creating nuspec at '$projectNuspecPath' from template '$nuspecTemplatePath'"
             # Copy the templated nuspec to the project nuspec if it doesn't exist
             if(!(Test-Path $projectNuspecPath)) {
                 Copy-Item $nuspecTemplatePath $projectNuspecPath
@@ -121,16 +123,16 @@ function Install-NuSpec {
             }
             
             try {
+                write-verbose "adding nuspec to project"
                 # Add nuspec file to the project
-                $project.ProjectItems.AddFromFile($projectNuspecPath) | Out-Null
-                $project.Save()
+                add-itemToProject $project $projectNuspecPath
 				
 				Set-MSBuildProperty NuSpecFile $projectNuspec $project.Name
                 
                 "Updated '$($project.Name)' to use nuspec '$projectNuspec'"
             }
             catch {
-                Write-Warning "Failed to install nuspec '$projectNuspec' into '$($project.Name)'"
+                Write-Warning "Failed to install nuspec '$projectNuspec' into '$($project.Name)': $_"
             }
         }
     }
@@ -221,7 +223,8 @@ function Pack-Nuget {
                     $args += "-IncludeReferencedProjects"
                 }
                 
-                nuget pack $args
+                Write-Warning "running command 'nuget pack $args'"
+                nuget pack @args
 
                 
             }
@@ -238,7 +241,9 @@ function Push-Nuget {
         [string[]]$ProjectName,
         [string] $specFile,
         [parameter(Mandatory=$true)]
-        [string] $Source
+        [string] $Source,
+        [switch][bool] $Pack = $true,
+        [switch][bool] $noProjectRefs = $false
     )
     Process {
 
@@ -247,6 +252,10 @@ function Push-Nuget {
         if(!$projects) {
             Write-Error "Unable to locate project. Make sure it isn't unloaded."
             return
+        }
+
+        if ($Pack) {
+            Pack-Nuget -ProjectName $ProjectName -specFile $specFile -noProjectRefs:$noProjectRefs
         }
 		
 		$profileDirectory = Split-Path $profile -parent
@@ -278,7 +287,8 @@ function Push-Nuget {
                     $nupkgs = gci . -Filter "*.nupkg" -File
                 }
 
-                $nupkgs | sort -Descending -Property CreationTime
+                $nupkgs = $nupkgs | sort -Descending -Property CreationTime
+                $nupkgs 
                 $pkg = $nupkgs[0]
                 
                 nuget push $pkg.FullName -source $source
@@ -290,11 +300,21 @@ function Push-Nuget {
     }
 }
 
+function add-itemToProject($project, $file) {
+    if ($project.ProjectItems -ne $null) {
+        $project.ProjectItems.AddFromFile($file) | Out-Null
+        $project.Save()
+    } else {
+        # assume a fallback function 'add-projectItem' exists
+        add-projectItem $project.FullName $file -Verbose:$($VerbosePreference -eq "Continue")
+    }
+}
+
 # Statement completion for project names
 'Install-NuSpec', 'Enable-NuSpecIntelliSense', 'Pack-Nuget', 'Push-Nuget'  | %{ 
-    Register-TabExpansion $_ @{
-        ProjectName = { Get-Project -All | Select -ExpandProperty Name }
-    }
+    #Register-TabExpansion $_ @{
+    #    ProjectName = { Get-Project -All | Select -ExpandProperty Name }
+    #}
 }
 
 Export-ModuleMember Install-NuSpec, Enable-NuSpecIntelliSense, Pack-Nuget, Push-Nuget

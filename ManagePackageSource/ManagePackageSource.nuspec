@@ -9,8 +9,8 @@
     <description>Manage NuGet package sources from the NuGet PowerShell Console</description>
   </metadata>
   <files>
-    <file src="tools\init.ps1" target="tools" />
-    <file src="tools\ManagePackageSources.psd1" target="tools" />
-    <file src="tools\ManagePackageSources.psm1" target="tools" />
+    <file src="ManagePackageSource\init.ps1" target="tools" />
+    <file src="ManagePackageSource\ManagePackageSources.psd1" target="tools" />
+    <file src="ManagePackageSource\ManagePackageSources.psm1" target="tools" />
   </files>
 </package>

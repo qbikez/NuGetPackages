@@ -1,31 +1,31 @@
-@{
+﻿@{
 
 # Script module or binary module file associated with this manifest
-ModuleToProcess = 'ManagePackageSources.psm1'
+ModuleToProcess = 'NuSpec.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.1'
+ModuleVersion = '2.0.1'
 
 # ID used to uniquely identify this module
-GUID = '0012ae2A-89e4-414c-81a6-31861bafb6f2'
+GUID = '6FA48925-78C1-43CB-9243-5FDB52F76434'
 
 # Author of this module
-Author = 'Maarten Balliauw'
+Author = 'Xavier Decoster'
 
 # Company or vendor of this module
-CompanyName = ''
+CompanyName = 'MyGet'
 
 # Copyright statement for this module
-Copyright = '(c) 2011 Maarten Balliauw. All rights reserved.'
+Copyright = '(c) 2012 MyGet. All rights reserved.'
 
 # Description of the functionality provided by this module
-Description = 'Manage NuGet package sources from the NuGet PowerShell Console'
+Description = 'This module provides a powershell cmdlet that makes working with nuspec files easier'
 
 # Minimum version of the Windows PowerShell engine required by this module
 PowerShellVersion = '2.0'
 
 # Name of the Windows PowerShell host required by this module
-PowerShellHostName = 'Package Manager Host'
+# PowerShellHostName = 'Package Manager Host'
 
 # Minimum version of the Windows PowerShell host required by this module
 PowerShellHostVersion = '1.2'
@@ -55,7 +55,7 @@ TypesToProcess = @()
 FormatsToProcess = @()
 
 # Modules to import as nested modules of the module specified in ModuleToProcess
-NestedModules = @('ManagePackageSources.psm1')
+NestedModules = @('NuSpec.psm1')
 
 # Functions to export from this module
 FunctionsToExport = '*'
@@ -76,3 +76,9 @@ FileList = @()
 PrivateData = ''
 
 }
+
+
+
+
+
+

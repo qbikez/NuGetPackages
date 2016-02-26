@@ -11,4 +11,8 @@
     <description>Powershell cmdlet that makes working with NuSpec files easier!</description>
     <releaseNotes>Support for NuGet v2.7 Package Restore</releaseNotes>
   </metadata>
+    <files>
+    <file src="NuSpec\*" target="tools" />
+  </files>
+
 </package>

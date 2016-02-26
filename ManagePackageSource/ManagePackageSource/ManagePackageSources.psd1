@@ -4,7 +4,7 @@
 ModuleToProcess = 'ManagePackageSources.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.1'
+ModuleVersion = '0.1.1'
 
 # ID used to uniquely identify this module
 GUID = '0012ae2A-89e4-414c-81a6-31861bafb6f2'
